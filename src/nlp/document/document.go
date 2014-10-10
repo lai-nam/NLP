@@ -8,6 +8,8 @@ import (
 	"net/http"
 
 	"gopkg.in/mgo.v2"
+
+	"db"
 )
 
 type Config struct {
@@ -21,39 +23,41 @@ type Document struct {
 }
 
 type DocumentController struct {
-	Db *mgo.Database
-	C  *mgo.Collection
+	Repo db.RepoI
 }
 
-func NewDocumentController(config Config) *DocumentController {
+func NewDocumentCtrl(config db.Config) *DocumentController {
 
 	return &DocumentController{
-		Db: config.Db,
-		C:  config.Db.C(config.CollectionName),
+		db.NewRepoS(config),
 	}
 }
 
 func (d *DocumentController) Post(w http.ResponseWriter, r *http.Request) {
-	C := d.C
-
 	data, _ := ioutil.ReadAll(r.Body)
 
 	var doc Document
 	err := json.Unmarshal(data, &doc)
 
 	if err != nil {
-		log.Printf("unmarshal erro %v", err)
+		log.Printf("unmarshal error %v", err)
 		return
 	}
 
-	err = C.Insert(doc)
+	Repo := d.Repo
 
+	err = Repo.Create(doc)
 	if err != nil {
-		http.Error(w, "bad request", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	w.Write([]byte("ok"))
+	data, err = json.Marshal(doc)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	w.Write(data)
 }
 
 func (d *DocumentController) Index(w http.ResponseWriter, r *http.Request) {
@@ -63,13 +67,20 @@ func (d *DocumentController) Index(w http.ResponseWriter, r *http.Request) {
 
 func (d *DocumentController) Get(w http.ResponseWriter, r *http.Request) {
 
-	C := d.C
-
 	var docs []Document
 
-	C.Find(nil).All(&docs)
+	err := d.Repo.List(nil, &docs)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-	data, _ := json.Marshal(docs)
+	data, err := json.Marshal(docs)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	w.Write(data)
 }

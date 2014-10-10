@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Word</title>
+
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+
+</head>
+
+<body>
+
+    <h3>Post words Below</h3>
+    <br/>
+
+    <div class="row">
+        <div class="col-md-6">
+
+            <label>word</label>
+            <br/>
+            <input class="form-control" id="nlp_word">
+            <br/>
+            <label>Tag:</label>
+            <br/>
+
+            <select class="form-control" id="nlp_tags">
+                {{range .}}
+                <option value={{.}}>{{.}}</option>
+                {{end}}
+            </select>
+
+            <hr/>
+            <button type="button" class="pull-right btn btn-primary" onclick="Word_POST()">POST</button>
+        </div>
+        <div class="col-md-6"></div>
+    </div>
+    <script type="text/javascript" src="/js/word.js"></script>
+
+</body>
+
+</html>
