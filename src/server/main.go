@@ -1,62 +1,73 @@
 package main
 
 import (
+	"flag"
 	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2"
 	"log"
 	"net/http"
 
-	"db"
-	"nlp/document"
-	"nlp/partofspeech"
-	"nlp/word"
+	. "server/editor"
 )
 
 var (
-	docCtrl      *document.DocumentController
-	partOfSpeech *partofspeech.PartOfSpeechController
-	newWord      *word.WordController
+	db *mgo.Database
+
+	dir = flag.String("dir", "client", `-dir=???`)
 )
 
 func init() {
-	db.Connect("127.0.0.1")
+	db = connectDatabase("127.0.0.1", "nlp")
 
-	docCtrl = document.NewDocumentCtrl(db.Config{
-		CollectionName: "document",
-	})
+	// edit = editor.New(
+	// 	func(e *editor.Editor) {
+	// 		e.Collection = db.
+	// 	}
+	// )
 
-	partOfSpeech = partofspeech.NewPartOfSpeechCtrl(db.Config{
-		CollectionName: "partofspeech",
-	})
-	newWord = word.NewWord(db.Config{
-		CollectionName: "word",
-	})
 }
 func main() {
+
+	flag.Parse()
+
 	router := mux.NewRouter()
+	staticSetup(router)
 
-	router.PathPrefix("/api/documents/").Methods("POST").HandlerFunc(docCtrl.Post)
-	router.PathPrefix("/documents/").Methods("GET").HandlerFunc(docCtrl.Index)
-	router.PathPrefix("/api/documents/").Methods("GET").HandlerFunc(docCtrl.Get)
+	// router for editor
 
-	router.PathPrefix("/api/partofspeechs/").Methods("GET").HandlerFunc(partOfSpeech.List)
-	router.PathPrefix("/api/partofspeechs/").Methods("POST").HandlerFunc(partOfSpeech.Post)
-	router.PathPrefix("/api/partofspeechs/").Methods("GET").HandlerFunc(partOfSpeech.Index)
-	router.PathPrefix("/api/words/").Methods("POST").HandlerFunc(newWord.Post)
-	router.PathPrefix("/api/words/").Methods("GET").HandlerFunc(newWord.Get)
-	router.PathPrefix("/words/").Methods("GET").HandlerFunc(newWord.Index)
+	edit := New(
+		func(e *Editor) {
+			e.Collection = db.C("dictionary")
+		},
+		func(e *Editor) {
+			e.Dir = *dir
+		},
+	)
 
-	router.PathPrefix("/js/").Methods("GET").
-		Handler(http.StripPrefix("/js/", http.FileServer(http.Dir("client/js"))))
-
-	router.PathPrefix("/fonts/").Methods("GET").
-		Handler(http.StripPrefix("/fonts/", http.FileServer(http.Dir("client/fonts"))))
-
-	router.PathPrefix("/css/").Methods("GET").
-		Handler(http.StripPrefix("/css/", http.FileServer(http.Dir("client/css"))))
+	sub := router.PathPrefix("/v1").Subrouter()
+	sub.Path("/editor").Methods("GET").HandlerFunc(edit.View("html/editor.html"))
+	sub.Path("/datatable").Methods("GET").HandlerFunc(edit.View("html/datatable.html"))
+	sub.Path("/editors/").Methods("GET").HandlerFunc(edit.List(Pagination{Page: 0, PerPage: 10}))
+	sub.Path("/editor/{id}").Methods("PUT").HandlerFunc(edit.Put())
+	sub.Path("/editor/{id}").Methods("GET").HandlerFunc(edit.Get())
+	sub.Path("/editor/").Methods("POST").HandlerFunc(edit.Create())
 
 	log.Printf("starting server at port %d", 80)
 	http.ListenAndServe(":80", router)
+}
+
+func staticSetup(router *mux.Router) {
+	router.PathPrefix("/js/").Methods("GET").
+		Handler(http.StripPrefix("/js/", http.FileServer(http.Dir(*dir+"/js"))))
+
+	router.PathPrefix("/fonts/").Methods("GET").
+		Handler(http.StripPrefix("/fonts/", http.FileServer(http.Dir(*dir+"/fonts"))))
+
+	router.PathPrefix("/css/").Methods("GET").
+		Handler(http.StripPrefix("/css/", http.FileServer(http.Dir(*dir+"/css"))))
+
+	router.PathPrefix("/images/").Methods("GET").
+		Handler(http.StripPrefix("/images/", http.FileServer(http.Dir(*dir+"/images"))))
 }
 
 func connectDatabase(url, dbname string) *mgo.Database {
