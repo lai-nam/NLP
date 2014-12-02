@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Document Training</title>
+
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+
+
+    <script type="text/javascript" src="/js/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/dataset.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="container header">
+            <div class="logo">
+                <img src="/images/logo.png">
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <div class="de-document">
+        	<div class="row">
+        		<label for="document">Dữ liệu: </label>
+	            <textarea id="document"></textarea>	
+        	</div>
+        	<div class="row">
+        		<label for="cl">Đánh giá: </label>
+	            <select id="cl" class="lvselect" onchange="polarityChange()">
+	            	<option value="1">Tích cực</option>
+	            	<option value="-1">Tiêu cực</option>
+	            </select>
+	            <div class="icon-emotion">
+	            </div>
+        	</div>
+        	<div class="row">
+        		<button id="save" type="button" class="lvbtn primary save" style="margin: 0 auto;">Lưu</button>	
+        	</div>
+            
+        </div>
+    </div>
+</body>
+
+</html>

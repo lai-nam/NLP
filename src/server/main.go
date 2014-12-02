@@ -8,6 +8,9 @@ import (
 	"net/http"
 
 	. "server/editor"
+
+	_ "server/lexicons"
+	"server/training"
 )
 
 var (
@@ -51,6 +54,32 @@ func main() {
 	sub.Path("/editor/{id}").Methods("PUT").HandlerFunc(edit.Put())
 	sub.Path("/editor/{id}").Methods("GET").HandlerFunc(edit.Get())
 	sub.Path("/editor/").Methods("POST").HandlerFunc(edit.Create())
+
+	tr := training.New(func(t *training.TrainingController) {
+		t.C = db.C("trainingset")
+	},
+		func(t *training.TrainingController) {
+			t.Dir = *dir
+		})
+
+	sub.Path("/training/").Methods("GET").HandlerFunc(tr.List)
+	sub.Path("/trainging/{id}").Methods("GET").HandlerFunc(tr.Get)
+	sub.Path("/training/").Methods("POST").HandlerFunc(tr.Create)
+	sub.Path("/training").Methods("GET").HandlerFunc(tr.View("html/dataset.html"))
+
+	// lex := lexicons.New(
+	// 	func(l *lexicons.Editor) {
+	// 		l.Collection = db.C("lexicon")
+	// 	},
+	// 	func(l *lexicons.Editor) {
+	// 		l.Dir = *dir
+	// 	})
+
+	// sub.Path("/lexicon").Methods("GET").HandlerFunc(lex.View("html/lexicon.html"))
+	// sub.Path("/lexicon/").Methods("GET").HandlerFunc(lex.List(lexicons.Pagination{Page: 0, PerPage: 10}))
+	// sub.Path("/lexicon/{id}").Methods("PUT").HandlerFunc(lex.Put())
+	// sub.Path("/lexicon/{id}").Methods("GET").HandlerFunc(lex.Get())
+	// sub.Path("/lexicon/").Methods("POST").HandlerFunc(lex.Create())
 
 	log.Printf("starting server at port %d", 80)
 	http.ListenAndServe(":80", router)

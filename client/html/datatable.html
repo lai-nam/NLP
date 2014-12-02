@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Editor</title>
+
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap-combined.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+
+
+    <script type="text/javascript" src="/js/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="/js/underscore.js"></script>
+    <script type="text/javascript" src="/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap-paginator.js"></script>
+
+
+</head>
+
+<body>
+    <header>
+        <div class="container header">
+            <div class="logo">
+                <img src="/images/logo.png">
+            </div>
+        </div>
+
+    </header>
+    <div class="menu">
+        <div class="container">
+            <div class="menu-item">
+                <span>Chỉnh sửa</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container body">
+        <div class="form">
+            <div class="title green">
+                Bảng dữ liệu
+            </div>
+            <div class="content">
+                <table id="table" class="display" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th>Từ (Headword)</th>
+                            <th>Loại từ</th>
+                            <th>Loại từ con</th>
+                            <th>Định nghĩa</th>
+                            <th>Tiếng anh</th>
+                            <th>Gán Nhãn</th>
+                            <th>Từ loại</th>
+                        </tr>
+                    </thead>
+                </table>
+                <div id="panigation" class="panigation"></div>
+            </div>
+        </div>
+    </div>
+    <div class="btnControl">
+        <div id="btnEdit" class="lvbtn primary">Sửa</div>
+        <div id="btnDelete" class="lvbtn danger">Xóa</div>
+    </div>
+
+    <div class="form t1 editbox">
+        <div class="title red">
+            Chỉnh sửa
+        </div>
+        <div class="content">
+            <div class="row">
+                <label for="ip1" class="lbname col-sm-4">Tên Label:</label>
+                <div class="col-sm-8">
+                    <input type="email" class="form-control" id="ip1" placeholder="Text">
+                </div>
+            </div>
+            <div class="row">
+                <label for="ip1" class="lbname col-sm-4">Tên Label:</label>
+                <div class="col-sm-8">
+                    <input type="email" class="form-control" id="ip1" placeholder="Text">
+                </div>
+            </div>
+
+        </div>
+        <div class="footer">
+            <div class="row">
+                <button id="btnSave" type="button" class="lvbtn success" style="margin: 0 auto;">Lưu</button>
+                <button id="btnCancel" type="button" class="lvbtn default" style="margin: 0 auto;">Hủy</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="text/javascript" src="/js/datatable.js"></script>
+</body>
+
+</html>
